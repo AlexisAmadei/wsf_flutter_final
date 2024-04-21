@@ -2,8 +2,19 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'dart:io';
+
+class MyHttpOverrides extends HttpOverrides {
+  @override
+  HttpClient createHttpClient(SecurityContext? context) {
+    return super.createHttpClient(context)
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
+  }
+}
 
 void main() {
+  HttpOverrides.global = MyHttpOverrides();
   runApp(const MyApp());
 }
 
@@ -400,8 +411,7 @@ class _VehiclesPageState extends State<VehiclesPage> {
     });
 
     try {
-      final response =
-          await http.get(Uri.parse('https://swapi.dev/api/vehicles/'));
+      final response = await http.get(Uri.parse('https://swapi.dev/api/vehicles/'));
       if (response.statusCode == 200) {
         final decodedData = jsonDecode(response.body) as Map<String, dynamic>;
         final vehicleList = decodedData['results'] as List;
@@ -525,22 +535,22 @@ class _SpeciesPageState extends State<SpeciesPage> {
     });
 
     try {
-      final response =
-          await http.get(Uri.parse('https://swapi.dev/api/species/'));
+      final response = await http.get(Uri.parse('https://swapi.dev/api/species/'));
       if (response.statusCode == 200) {
         final decodedData = jsonDecode(response.body) as Map<String, dynamic>;
         final speciesList = decodedData['results'] as List;
         species = speciesList
             .map((speciesData) => Species.fromJson(speciesData))
             .toList();
-        setState(() {
-          isLoading = false;
-        });
       }
     } catch (error) {
       if (kDebugMode) {
         print('Error fetching species data: $error');
       }
+    } finally {
+      setState(() {
+          isLoading = false;
+        });
     }
   }
 
