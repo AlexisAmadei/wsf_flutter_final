@@ -1,10 +1,7 @@
 import 'dart:convert';
-import 'dart:ffi';
-
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-
-import 'package:flutter/foundation.dart'; // kDebugMode (à retirer avant rendu)
 
 void main() {
   runApp(const MyApp());
